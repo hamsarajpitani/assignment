@@ -32,33 +32,30 @@ const Test = ()=>{
         getToken()
     },[])
 
+    useEffect(()=>{
+        debounceSearch(search)
+    },[search])
+
+    const getData = async (search)=>{
+         const getResult = await axios.get(`http://3.108.244.88:5000/api/data?search_string=${search}`,config);
+          setData([...getResult.data])
+     }
+ 
+    const debounceSearch = useCallback(debounce(search =>{
+         getData(search)
+    },200),[])
 
 
-    const debounceSearch = async (value)=>{
-        setSearch(value)
-        const getResult = await axios.get(`http://3.108.244.88:5000/api/data?search_string=${search}`,config);
-        setData(getResult.data)
-        // debounce(()=>{
-        //     setData(getResult.data)
-        // },300)
-    }
-
-    const handleSearch =  (e)=>{
-        const {value} = e.target;
-        debounceSearch(value)
-    }
-    
     return(
         <>
-         <input type="text" value={search} onChange={handleSearch} />
+         <input type="text" onChange={(e)=>setSearch(e.target.value)} />
           {
-               data.length > 1 && search ? data?.map((d,index) =>(
+               data.length > 1 && search?.length > 1 ? data?.map((d,index) =>(
                   <div key={index}>
                   <p>{d}</p>
                   </div>
               )) : 
-              <p>please enter something valid</p>
-              
+              <p>please enter something valid</p>              
           }      
         </>
     )
